@@ -10,8 +10,8 @@ namespace DataViz.Sales.Api.Demo;
 /// </summary>
 internal sealed class DemoSaleFactory(IReadOnlyList<StoreResponse> stores, Random random)
 {
-    private const int BaseSalesPerDay = 22;
-    private const double DailyGrowth = 0.2;
+    private const int BaseSalesPerDay = 90;
+    private const double DailyGrowth = 0.6;
     private const int OpeningHourUtc = 12;
     private const int OpenHours = 12;
     private const int MaxHoursUntilRefund = 96;
@@ -49,6 +49,15 @@ internal sealed class DemoSaleFactory(IReadOnlyList<StoreResponse> stores, Rando
 
         return (int)Math.Round((BaseSalesPerDay + (dayIndex * DailyGrowth)) * weekdayFactor * noise);
     }
+
+    /// <summary>
+    /// Time between two live sales, paced so a full day sells about as much as the days in the
+    /// history. A faster demo would make "today" dwarf every other day on the chart.
+    /// </summary>
+    public TimeSpan TypicalGapOn(DateOnly day, int dayIndex) =>
+        TimeSpan.FromSeconds(OpenHours * 3600.0 / Math.Max(1, SalesOn(day, dayIndex)) * (0.5 + random.NextDouble()));
+
+    public static bool IsOpenAt(DateTime momentUtc) => momentUtc.Hour >= OpeningHourUtc;
 
     public RecordSaleCommand SaleAt(DateTime occurredAtUtc)
     {

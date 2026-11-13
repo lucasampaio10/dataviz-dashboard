@@ -13,8 +13,6 @@ internal sealed class DemoOptions
 
     public int HistoryDays { get; set; } = 60;
 
-    public double SecondsBetweenSales { get; set; } = 4;
-
     public double RefundRate { get; set; } = 0.04;
 }
 
@@ -87,10 +85,16 @@ internal sealed class DemoSalesGenerator(
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var pause = _options.SecondsBetweenSales * (0.5 + Random.Shared.NextDouble());
-            await Task.Delay(TimeSpan.FromSeconds(pause), stoppingToken);
+            var today = DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime);
+            await Task.Delay(factory.TypicalGapOn(today, _options.HistoryDays), stoppingToken);
 
-            var sale = await Send(factory.SaleAt(clock.GetUtcNow().UtcDateTime), stoppingToken);
+            var now = clock.GetUtcNow().UtcDateTime;
+            if (!DemoSaleFactory.IsOpenAt(now))
+            {
+                continue;
+            }
+
+            var sale = await Send(factory.SaleAt(now), stoppingToken);
             if (factory.Chance(_options.RefundRate))
             {
                 await Send(new RefundSaleCommand(sale.Value), stoppingToken);

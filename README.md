@@ -74,7 +74,7 @@ docker compose up -d --build
 | http://localhost:8082/swagger | Analytics API (leitura) |
 | http://localhost:15673 | Painel do RabbitMQ (`dataviz` / `dataviz`) |
 
-Na primeira subida, um gerador de demonstração cria 60 dias de histórico (cerca de 1.700 vendas) e continua registrando uma venda a cada poucos segundos, para o painel ter movimento. Todas passam pelo mesmo comando que um cliente real usaria. Para subir sem dados de demonstração:
+Na primeira subida, um gerador de demonstração cria 60 dias de histórico (cerca de 6.500 vendas; leva perto de um minuto) e continua vendendo no mesmo ritmo dos dias anteriores, uma venda a cada poucos minutos em horário comercial. O ritmo é proposital: um gerador mais rápido faria o dia de hoje esmagar o resto do gráfico. Todas passam pelo mesmo comando que um cliente real usaria. Para subir sem dados de demonstração:
 
 ```bash
 DEMO_ENABLED=false docker compose up -d --build
