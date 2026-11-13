@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\DataViz.Analytics.Infrastructure\DataViz.Analytics.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Analytics\DataViz.Analytics.Application\DataViz.Analytics.Application.csproj" />
+  </ItemGroup>
+</Project>

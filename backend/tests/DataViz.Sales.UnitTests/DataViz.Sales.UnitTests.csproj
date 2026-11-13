@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Sales\DataViz.Sales.Application\DataViz.Sales.Application.csproj" />
+  </ItemGroup>
+</Project>

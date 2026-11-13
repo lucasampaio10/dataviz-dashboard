@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataViz.Sales.Application\DataViz.Sales.Application.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\DataViz.BuildingBlocks.Infrastructure\DataViz.BuildingBlocks.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

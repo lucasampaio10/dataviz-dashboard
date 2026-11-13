@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\DataViz.Contracts\DataViz.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DataViz.Analytics.UnitTests" />
+  </ItemGroup>
+</Project>

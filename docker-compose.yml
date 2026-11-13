@@ -1,0 +1,88 @@
+name: dataviz
+
+x-backend: &backend
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+
+x-rabbitmq-env: &rabbitmq-env
+  RabbitMq__Host: rabbitmq
+  RabbitMq__User: ${RABBITMQ_USER:-dataviz}
+  RabbitMq__Password: ${RABBITMQ_PASSWORD:-dataviz}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dataviz}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dataviz}
+    volumes:
+      - ./deploy/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5441:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dataviz}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-dataviz}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-dataviz}
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Write side: records sales and publishes what happened.
+  sales-api:
+    <<: *backend
+    build:
+      context: ./backend
+      args:
+        PROJECT: Sales/DataViz.Sales.Api
+        ASSEMBLY: DataViz.Sales.Api
+    environment:
+      <<: *rabbitmq-env
+      ConnectionStrings__Database: Host=postgres;Database=dataviz_sales;Username=${POSTGRES_USER:-dataviz};Password=${POSTGRES_PASSWORD:-dataviz}
+      Demo__Enabled: ${DEMO_ENABLED:-true}
+    ports:
+      - "8081:8080"
+
+  # Read side: projects the events into tables shaped for the dashboard and serves them.
+  analytics-api:
+    <<: *backend
+    build:
+      context: ./backend
+      args:
+        PROJECT: Analytics/DataViz.Analytics.Api
+        ASSEMBLY: DataViz.Analytics.Api
+    environment:
+      <<: *rabbitmq-env
+      ConnectionStrings__Database: Host=postgres;Database=dataviz_analytics;Username=${POSTGRES_USER:-dataviz};Password=${POSTGRES_PASSWORD:-dataviz}
+    ports:
+      - "8082:8080"
+
+  web:
+    restart: unless-stopped
+    build:
+      context: ./web
+    environment:
+      ANALYTICS_API_URL: http://analytics-api:8080
+    ports:
+      - "${WEB_PORT:-3100}:3000"
+    depends_on:
+      - analytics-api
+
+volumes:
+  postgres-data:

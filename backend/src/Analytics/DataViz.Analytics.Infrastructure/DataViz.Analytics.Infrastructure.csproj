@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Npgsql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataViz.Analytics.Application\DataViz.Analytics.Application.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\DataViz.BuildingBlocks.Infrastructure\DataViz.BuildingBlocks.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ReadModel\Schema.sql" />
+  </ItemGroup>
+</Project>
